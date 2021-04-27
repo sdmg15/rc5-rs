@@ -4,12 +4,8 @@ The purpose of this test is to implement a simple cipher in the form of rc5.
 
 Rivest describes the rc5 cipher here https://www.grc.com/r&d/rc5.pdf and includes a c reference implementation.
 
-For this test we ask that you implement rc5 in rust. Specifically rc5-32/12/16 for which we have included some test case, 
-feel free to expand and implement other versions of rc5 too if you wish. The test cases provided should pass. 
-Further test cases can be found here https://tools.ietf.org/id/draft-krovetz-rc6-rc5-vectors-00.html#rfc.section.4
+For this test we ask that you implement rc5 in rust. Specifically rc5-32/12/16 for which we have included some test case, feel free to expand and implement other versions of rc5 too if you wish. The test cases provided should pass. Further test cases can be found here https://tools.ietf.org/id/draft-krovetz-rc6-rc5-vectors-00.html#rfc.section.4
 
-Feel free to change the function stubs to accept different arguments or to return somethind else but remeber to change the test cases if you do so. 
-The code provided here is just a starting block.
+Feel free to change the function stubs to accept different arguments or to return somethind else but remeber to change the test cases if you do so. The code provided here is just a starting block.
 
-We'll be looking at your code to see how well you can follow a specification, to see if you can write idomatic rust 
-and to see if you can write bug-free maintainable code.
+We'll be looking at your code to see how well you can follow a specification, to see if you can write idomatic rust and to see if you can write bug-free maintainable code.
