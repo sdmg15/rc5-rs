@@ -6,7 +6,7 @@ Rivest describes the rc5 cipher here https://www.grc.com/r&d/rc5.pdf and include
 
 For this test we ask that you implement rc5 in rust. Specifically rc5-32/12/16 for which we have included some test case, 
 feel free to expand and implement other versions of rc5 too if you wish. The test cases provided should pass. 
-Further test cases can be found here https://tools.ietf.org/id/draft-krovetz-rc6-rc5-vectors-00.html#rfc.section.4
+Further test cases can be found here https://datatracker.ietf.org/doc/html/draft-krovetz-rc6-rc5-vectors-00#section-4
 
 Feel free to change the function stubs to accept different arguments or to return something else but remember to change the
 test cases if you do so. The code provided here is just a starting block.
