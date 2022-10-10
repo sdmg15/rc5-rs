@@ -12,3 +12,4 @@ Feel free to change the function stubs to accept different arguments or to retur
 test cases if you do so. The code provided here is just a starting block.
 
 We'll be looking at your code to see how well you can follow a specification, to see if you can write idiomatic rust and to see if you can write bug-free maintainable code.
+Make sure you handle error sensibly and design some nice abstractions. 
