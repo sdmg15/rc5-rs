@@ -2,6 +2,8 @@ Mintlayer recruitment test
 
 The purpose of this test is to implement a simple cipher in the form of rc5. 
 
+You should use stable rust for this project.
+
 Rivest describes the rc5 cipher here https://www.grc.com/r&d/rc5.pdf and includes a c reference implementation.
 
 For this test we ask that you implement rc5 in rust. Specifically rc5-32/12/16 for which we have included some test case, 
