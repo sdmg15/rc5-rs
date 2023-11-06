@@ -1,4 +1,5 @@
-// We are implementing RC5-w/r/b Where, w = 32, r = 12, b = 16 bytes (128 bit)
+mod helper;
+use std::{str::FromStr, fmt::Display};
 
 pub trait Rc5Trait {
 	type Word;
@@ -9,22 +10,17 @@ pub trait Rc5Trait {
 	fn decrypt(&self, ct: &[Self::Word; 2]) -> [Self::Word; 2];
 }
 
-use std::{str::FromStr, fmt::Display};
-
 const MAGIC_P32: u32 = 0xB7E15163;
 const MAGIC_Q32: u32 = 0x9E3779B9;
 
 pub struct ControlBlock {
+	#[allow(clippy::unused)]
     version: u8,
     word_size: u8,
     rounds: u8,
     secret_key_len: u8,
 	secret_key: Vec<u8> // K the b-byte secret key
 }
-
-// let expanded_key_size = 2 * (r + 1)
-// let num_of_words_in_key = 4; // c = [b/u] = 16/8=2 where u = w/8 = 8
-// let expanded_key_table: Vec<t>, //  where t = 2(r+1) = 2*13 = 26
 
 impl Default for ControlBlock {
 	fn default() -> Self {
@@ -97,7 +93,6 @@ impl FromStr for ControlBlock {
 
 impl ControlBlock {
 	pub fn new(version: u8, word_size: u8, rounds: u8, secret_key_len: u8, secret_key: Vec<u8>) -> Result<Self, &'static str> {
-		// Restrict the set of allowed values for word_size to be [16, 32, 64]
 		if ![8, 16, 32, 64].contains(&word_size) {
 			return Err("Invalid word size")
 		}
@@ -112,8 +107,7 @@ impl ControlBlock {
 	}
 
 	pub fn set_secret_key(&mut self, secret_key: Vec<u8>) {
-		// Check if the secret key passed in doesn't overcome the specified size
-		assert_eq!(secret_key.len(), self.secret_key_len.into());
+		assert_eq!(secret_key.len(), self.secret_key_len.into(), "Incorrect key size");
 		self.secret_key = secret_key;
 	}
 }
@@ -232,22 +226,11 @@ impl Rc5Trait for RC5 {
 
 }
 
-fn print_word(e: u32) -> String {
-	println!("PRINTING {} AS WORD", e);
-	let mut output = String::new();
-	for i in (0..32).step_by(8) {
-		let data = (e >> i) & 0xFF;
-		output.push_str(&format!("{:02X?}", data))
-	}
-	output
-}
 #[cfg(test)]
-
 mod tests {
 
-use std::convert::TryInto;
-
 use super::*;
+use crate::helper::{word_as_str, to_words};
 
 	#[test]
 	fn test_encrypt_from_str() {
@@ -256,8 +239,7 @@ use super::*;
 
 		let pt = [0u32, 0u32];
 		let [c1, c2] = rc5.encrypt(&pt);
-		let mut out = print_word(c1);
-		out.push_str(&print_word(c2));
+		let out = word_as_str(&[c1, c2]);
 
 		assert_eq!(out, "21A5DBEE154B8F6D");
 
@@ -274,8 +256,7 @@ use super::*;
 
 		let pt = [0u32, 0u32];
 		let [c1, c2] = rc5.encrypt(&pt);
-		let mut out = print_word(c1);
-		out.push_str(&print_word(c2));
+		let out = word_as_str(&[c1, c2]);
 
 		assert_eq!(out, "21A5DBEE154B8F6D");
 
@@ -295,8 +276,7 @@ use super::*;
 
 		let pt = [4007372065u32, 1838107413u32];
 		let [c1, c2] = rc5.encrypt(&pt);
-		let mut out = print_word(c1);
-		out.push_str(&print_word(c2));
+		let out = word_as_str(&[c1, c2]);
 
 		assert_eq!(out, "F7C013AC5B2B8952");
 
@@ -317,8 +297,7 @@ use super::*;
 
 		let pt = [2886975735, 1384721243];
 		let [c1, c2] = rc5.encrypt(&pt);
-		let mut out = print_word(c1);
-		out.push_str(&print_word(c2));
+		let out = word_as_str(&[c1, c2]);
 
 		assert_eq!(out, "2F42B3B70369FC92");
 
@@ -338,8 +317,7 @@ use super::*;
 
 		let pt = [3081978415, 2466015491];
 		let [c1, c2] = rc5.encrypt(&pt);
-		let mut out = print_word(c1);
-		out.push_str(&print_word(c2));
+		let out = word_as_str(&[c1, c2]);
 
 		assert_eq!(out, "65C178B284D197CC");
 
@@ -360,8 +338,7 @@ use super::*;
 
 		let pt = [2994258277, 3432501636];
 		let [c1, c2] = rc5.encrypt(&pt);
-		let mut out = print_word(c1);
-		out.push_str(&print_word(c2));
+		let out = word_as_str(&[c1, c2]);
 
 		assert_eq!(out, "EB44E415DA319824");
 
@@ -370,7 +347,6 @@ use super::*;
 		assert_eq!(pt[0], pt1);
 		assert_eq!(pt[1], pt2);
 	}
-
 
 	#[test]
     fn encode_a() {
@@ -383,12 +359,10 @@ use super::*;
     	let pt = vec![0x00, 0x11, 0x22, 0x33, 0x44, 0x55, 0x66, 0x77];
     	let ct = vec![0x2D, 0xDC, 0x14, 0x9B, 0xCF, 0x08, 0x8B, 0x9E];
 		
-		let plaintext1 = u32::from_ne_bytes(pt[0..4].try_into().unwrap());
-		let plaintext2 = u32::from_ne_bytes(pt[4..].try_into().unwrap());
+		let [plaintext1, plaintext2] = to_words(&pt);
 		let res = rc5.encrypt(&[plaintext1, plaintext2]);
 		
-		let ct1 = u32::from_ne_bytes(ct[0..4].try_into().unwrap());
-		let ct2 = u32::from_ne_bytes(ct[4..].try_into().unwrap());
+		let [ct1, ct2] = to_words(&ct);
 
     	assert_eq!(ct1, res[0]);
 		assert_eq!(ct2, res[1]);
@@ -405,12 +379,11 @@ use super::*;
     	let pt  = vec![0xEA, 0x02, 0x47, 0x14, 0xAD, 0x5C, 0x4D, 0x84];
     	let ct  = vec![0x11, 0xE4, 0x3B, 0x86, 0xD2, 0x31, 0xEA, 0x64];
 
-		let plaintext1 = u32::from_ne_bytes(pt[0..4].try_into().unwrap());
-		let plaintext2 = u32::from_ne_bytes(pt[4..].try_into().unwrap());
+		let [plaintext1, plaintext2] = to_words(&pt);
+
 		let res = rc5.encrypt(&[plaintext1, plaintext2]);
 		
-		let ct1 = u32::from_ne_bytes(ct[0..4].try_into().unwrap());
-		let ct2 = u32::from_ne_bytes(ct[4..].try_into().unwrap());
+		let [ct1, ct2] = to_words(&ct);
 
     	assert_eq!(ct1, res[0]);
 		assert_eq!(ct2, res[1]);
@@ -428,11 +401,8 @@ use super::*;
     	let pt  = vec![0x96, 0x95, 0x0D, 0xDA, 0x65, 0x4A, 0x3D, 0x62];
     	let ct  = vec![0x00, 0x11, 0x22, 0x33, 0x44, 0x55, 0x66, 0x77];
 
-		let plaintext1 = u32::from_ne_bytes(pt[0..4].try_into().unwrap());
-		let plaintext2 = u32::from_ne_bytes(pt[4..].try_into().unwrap());
-		
-		let ct1 = u32::from_ne_bytes(ct[0..4].try_into().unwrap());
-		let ct2 = u32::from_ne_bytes(ct[4..].try_into().unwrap());
+		let [plaintext1, plaintext2] = to_words(&pt);
+		let [ct1, ct2] = to_words(&ct);
 
     	let res = rc5.decrypt(&[ct1, ct2]);
 
@@ -452,15 +422,13 @@ use super::*;
 
 		let rc5 = RC5::init(ctrl);
 
-		let plaintext1 = u32::from_ne_bytes(pt[0..4].try_into().unwrap());
-		let plaintext2 = u32::from_ne_bytes(pt[4..].try_into().unwrap());
-		
-		let ct1 = u32::from_ne_bytes(ct[0..4].try_into().unwrap());
-		let ct2 = u32::from_ne_bytes(ct[4..].try_into().unwrap());
+		let [plaintext1, plaintext2] = to_words(&pt);
+		let [ct1, ct2] = to_words(&ct);
 
     	let res = rc5.decrypt(&[ct1, ct2]);
-    	assert!(plaintext1 == res[0]);
-		assert!(plaintext2 == res[1]);
+
+    	assert_eq!(plaintext1, res[0]);
+		assert_eq!(plaintext2, res[1]);
     }
 
 }
