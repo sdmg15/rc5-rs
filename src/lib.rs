@@ -87,10 +87,6 @@ impl FromStr for ControlBlock {
                     return Err(Rc5Error::InvalidWordSize);
                 }
 
-                if !(0..255).contains(&rounds) {
-                    return Err(Rc5Error::InvalidRoundRange);
-                }
-
                 Ok(Self {
                     version,
                     word_size,
@@ -110,9 +106,10 @@ impl ControlBlock {
         rounds: u8,
         secret_key_len: u8,
         secret_key: Vec<u8>,
-    ) -> Result<Self, &'static str> {
+    ) -> Result<Self, Rc5Error> {
+
         if ![16, 32, 64].contains(&word_size) {
-            return Err("Invalid word size");
+            return Err(Rc5Error::InvalidWordSize);
         }
 
         Ok(Self {
@@ -312,7 +309,7 @@ mod tests {
 
         let pt = [4007372065u32, 1838107413u32];
         let [c1, c2] = rc5.encrypt(&pt);
-        let out = word_as_str(&[c1, c2]);
+        let out = helper::word_as_str(&[c1, c2]);
 
         assert_eq!(out, "F7C013AC5B2B8952");
 
