@@ -1,7 +1,7 @@
 use std::convert::TryInto;
 
 pub fn word_as_str(e: &[u32; 2]) -> String {
-	let mut output = String::new();
+    let mut output = String::new();
 
     e.iter().for_each(|e| {
         for i in (0..32).step_by(8) {
@@ -10,7 +10,7 @@ pub fn word_as_str(e: &[u32; 2]) -> String {
         }
     });
 
-	output
+    output
 }
 
 pub fn to_words(v: &Vec<u8>) -> [u32; 2] {
