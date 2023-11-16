@@ -1,17 +1,4 @@
-Mintlayer recruitment test
+# RC5 Encryption
 
-The purpose of this test is to implement a simple cipher in the form of rc5. 
+My implementation of RC5 encrption algorithm
 
-You should use stable rust for this project.
-
-Rivest describes the rc5 cipher here https://www.grc.com/r&d/rc5.pdf and includes a c reference implementation.
-
-For this test we ask that you implement rc5 in rust. Specifically rc5-32/12/16 for which we have included some test case, 
-feel free to expand and implement other versions of rc5 too if you wish. The test cases provided should pass. 
-Further test cases can be found here https://datatracker.ietf.org/doc/html/draft-krovetz-rc6-rc5-vectors-00#section-4
-
-Feel free to change the function stubs to accept different arguments or to return something else but remember to change the
-test cases if you do so. The code provided here is just a starting block.
-
-We'll be looking at your code to see how well you can follow a specification, to see if you can write idiomatic rust and to see if you can write bug-free maintainable code.
-Make sure you handle error sensibly and design some nice abstractions. 
